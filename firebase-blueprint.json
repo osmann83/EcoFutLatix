@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Perfil de estudiante registrado en EcoFutLatix",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "ID del usuario de Firebase Authentication"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Apodo o nombre de usuario del estudiante (3 a 30 caracteres)"
+        },
+        "school": {
+          "type": "string",
+          "description": "Institución educativa pública de Cali a la que pertenece"
+        },
+        "birthDate": {
+          "type": "string",
+          "description": "Fecha de nacimiento en formato YYYY-MM-DD para validar edad entre 12 y 17 años"
+        },
+        "totalScore": {
+          "type": "integer",
+          "description": "Puntaje acumulado en todas las actividades y minijuegos"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de creación generada con FieldValue.serverTimestamp()"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de actualización generada con FieldValue.serverTimestamp()"
+        }
+      },
+      "required": ["userId", "nickname", "school", "birthDate", "totalScore", "createdAt", "updatedAt"]
+    },
+    "GameScore": {
+      "title": "GameScore",
+      "description": "Registro de puntaje obtenido en uno de los minijuegos de reciclaje",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "ID del usuario que logró el puntaje"
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Nombre de usuario del estudiante para el ranking"
+        },
+        "school": {
+          "type": "string",
+          "description": "Colegio del estudiante para rankings por institución"
+        },
+        "gameId": {
+          "type": "string",
+          "enum": ["basuraleza", "busqueda_tesoro", "encestar", "general"],
+          "description": "Identificador del minijuego jugado"
+        },
+        "score": {
+          "type": "integer",
+          "description": "Puntos obtenidos en la partida"
+        },
+        "itemsRecycled": {
+          "type": "integer",
+          "description": "Cantidad de residuos clasificados o recuperados correctamente"
+        },
+        "accuracy": {
+          "type": "integer",
+          "description": "Porcentaje de precisión (0 a 100)"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo del puntaje generada con FieldValue.serverTimestamp()"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Marca de tiempo de actualización generada con FieldValue.serverTimestamp()"
+        }
+      },
+      "required": ["userId", "nickname", "school", "gameId", "score", "itemsRecycled", "accuracy", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Colección de perfiles de estudiantes de Cali (12 a 17 años)"
+    },
+    "/scores/{scoreId}": {
+      "schema": "GameScore",
+      "description": "Colección global de puntajes de los minijuegos para tabla de posiciones en tiempo real"
+    }
+  }
+}

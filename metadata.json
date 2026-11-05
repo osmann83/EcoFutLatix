@@ -1,0 +1,6 @@
+{
+  "name": "EcoFutLatix",
+  "description": "Aplicación móvil gamificada de educación ambiental para jóvenes de 12 a 17 años con minijuegos de reciclaje y ranking global en tiempo real.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

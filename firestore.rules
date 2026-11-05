@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Red de seguridad global: denegar todo acceso por defecto
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Funciones auxiliares globales endurecidas
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Validación de esquema para UserProfile
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.nickname is string && data.nickname.size() >= 3 && data.nickname.size() <= 30 &&
+             data.school is string && data.school.size() >= 3 && data.school.size() <= 150 &&
+             data.birthDate is string && data.birthDate.size() >= 8 && data.birthDate.size() <= 12 &&
+             data.totalScore is int && data.totalScore >= 0 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // Validación de esquema para GameScore
+    function isValidGameScore(data) {
+      return data.userId is string && data.userId == request.auth.uid &&
+             data.nickname is string && data.nickname.size() >= 3 && data.nickname.size() <= 30 &&
+             data.school is string && data.school.size() >= 3 && data.school.size() <= 150 &&
+             data.gameId is string && data.gameId in ['basuraleza', 'busqueda_tesoro', 'encestar', 'general'] &&
+             data.score is int && data.score >= 0 && data.score <= 100000 &&
+             data.itemsRecycled is int && data.itemsRecycled >= 0 &&
+             data.accuracy is int && data.accuracy >= 0 && data.accuracy <= 100 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    // 1. Colección de usuarios / perfiles
+    match /users/{userId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+
+      allow create: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       isValidId(userId) &&
+                       incoming().keys().hasAll(['userId', 'nickname', 'school', 'birthDate', 'totalScore', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'nickname', 'school', 'birthDate', 'totalScore', 'createdAt', 'updatedAt']) &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isSignedIn() &&
+                       request.auth.uid == userId &&
+                       isValidId(userId) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['nickname', 'school', 'birthDate', 'totalScore', 'updatedAt']) &&
+                       isValidUserProfile(incoming());
+
+      allow delete: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 2. Colección de puntajes para tabla de posiciones global en tiempo real
+    match /scores/{scoreId} {
+      allow get: if isSignedIn();
+      allow list: if isSignedIn() && resource.data.gameId in ['basuraleza', 'busqueda_tesoro', 'encestar', 'general'];
+
+      allow create: if isSignedIn() &&
+                       isValidId(scoreId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll(['userId', 'nickname', 'school', 'gameId', 'score', 'itemsRecycled', 'accuracy', 'createdAt', 'updatedAt']) &&
+                       incoming().keys().hasOnly(['userId', 'nickname', 'school', 'gameId', 'score', 'itemsRecycled', 'accuracy', 'createdAt', 'updatedAt']) &&
+                       isValidGameScore(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(scoreId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().diff(existing()).affectedKeys().hasOnly(['score', 'itemsRecycled', 'accuracy', 'nickname', 'school', 'updatedAt']) &&
+                       isValidGameScore(incoming());
+
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid;
+    }
+  }
+}
