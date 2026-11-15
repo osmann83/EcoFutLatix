@@ -1,2 +1,22 @@
-# EcoFutLatix
-El proyecto EcoFutLatix propone el desarrollo de una aplicación móvil educativa gamificada para fortalecer la educación ambiental en estudiantes de 12 a 17 años de instituciones educativas públicas de Cali, Valle del Cauca. La iniciativa surge de la necesidad de promover el cuidado del medio ambiente, la conservación de los recursos naturales y la adopción de prácticas sostenibles mediante estrategias educativas apoyadas en tecnologías digitales. La aplicación para dispositivos Android integrará contenidos educativos, videos, minijuegos, retos y actividades interactivas relacionadas con el reciclaje, el ahorro de recursos, el cambio climático y la protección de las especies. La metodología comprenderá el análisis de las necesidades de los usuarios, la definición de requisitos, el diseño de la solución, el desarrollo del prototipo y la realización de pruebas de funcionalidad y usabilidad. Se espera obtener un prototipo funcional y de fácil uso que sirva como herramienta complementaria para la educación ambiental. El proyecto se relaciona con el Objetivo de Desarrollo Sostenible 13, Acción por el Clima.
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
+
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/d90bd10e-91ba-4361-a82c-78b7e9bbc839
+
+## Run Locally
+
+**Prerequisites:**  [Android Studio](https://developer.android.com/studio)
+
+
+1. Open Android Studio
+2. Select **Open** and choose the directory containing this project
+3. Allow Android Studio to fix any incompatibilities as it imports the project.
+4. Create a file named `.env` in the project directory and set `GEMINI_API_KEY` in that file to your Gemini API key (see `.env.example` for an example)
+5. Remove this line from the app's `build.gradle.kts` file: `signingConfig = signingConfigs.getByName("debugConfig")`
+6. Run the app on an emulator or physical device
+7. If you have already published your app in AI Studio, please [request upload key reset](https://support.google.com/googleplay/android-developer/answer/9842756#zippy=%2Crequest-an-upload-key-reset) in Google Play Console.
