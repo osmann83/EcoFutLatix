@@ -1,6 +1,19 @@
 import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
 import java.time.Duration
 
+import java.util.Properties
+import java.io.FileInputStream
+
+// Función para leer de local.properties
+fun getProperty(propName: String): String {
+    val localProperties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localProperties.load(FileInputStream(localPropertiesFile))
+    }
+    return localProperties.getProperty(propName) ?: System.getenv(propName) ?: ""
+}
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
@@ -27,11 +40,13 @@ android {
   // and updating Android apps in AI Studio.
   signingConfigs {
     create("release") {
-      val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
-      storeFile = file(keystorePath)
-      storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
-      keyPassword = System.getenv("KEY_PASSWORD")
+      val keystorePath = getProperty("KEYSTORE_PATH")
+      if (keystorePath.isNotEmpty()) {
+          storeFile = file(keystorePath)
+          storePassword = getProperty("STORE_PASSWORD")
+          keyAlias = getProperty("KEY_ALIAS")
+          keyPassword = getProperty("KEY_PASSWORD")
+      }
     }
     create("debugConfig") {
       storeFile = file("${rootDir}/debug.keystore")
